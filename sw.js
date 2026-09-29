@@ -1,5 +1,5 @@
 // Bump VERSION whenever you publish a new release so users get the update.
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = 'trench-safety-' + VERSION;
 
 const APP_SHELL = [
