@@ -374,3 +374,5 @@ html.install-gate #installScreen {
 .gate-btn[hidden], .gate-help[hidden], .gate-done[hidden] { display: none; }
 .gate-help { max-width: 340px; background: rgba(255,255,255,0.1); border-left: 4px solid #FF6B35; padding: 12pt; text-align: left; font-size: 10.5pt; }
 .gate-done { color: #7CE38B; font-weight: 700; }
+.gate-help ol { margin: 8pt 0 0 18pt; padding: 0; }
+.gate-help li { margin-bottom: 6pt; }
