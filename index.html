@@ -445,10 +445,22 @@
         help.hidden = true;
         btn.hidden = false;
     });
+    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
     btn.addEventListener('click', function () {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function () { deferredPrompt = null; });
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(function () { deferredPrompt = null; });
+            return;
+        }
+        if (isIOS) {
+            // iOS has no install API: open the share sheet (it contains "Add to Home Screen")
+            if (navigator.share) {
+                navigator.share({ title: document.title, url: location.href }).catch(function () {});
+            }
+            showHelp();
+        }
     });
     window.addEventListener('appinstalled', function () {
         btn.hidden = true;
@@ -456,17 +468,20 @@
         done.hidden = false;
     });
 
-    // Browsers without an install prompt (iPhone/iPad Safari, etc.) get instructions instead
-    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
-                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    // Browsers without an install prompt (iPhone/iPad, etc.) get step-by-step instructions
     function showHelp() {
         if (deferredPrompt || !done.hidden) return;
-        help.textContent = isIOS
-            ? 'To install: tap the Share button in Safari, then choose "Add to Home Screen".'
-            : 'To install: open your browser menu (⋮) and choose "Install app" or "Add to Home screen". If you already installed it, open it from your apps list.';
+        if (isIOS) {
+            help.innerHTML = '<b>Apple requires 3 quick taps to install:</b><ol>' +
+                '<li>Tap the <b>Share</b> button (square with an up arrow) in Safari.</li>' +
+                '<li>Scroll down and tap <b>Add to Home Screen</b> (tap <b>More</b> first if you don\'t see it).</li>' +
+                '<li>Tap <b>Add</b>, then open the app from your home screen.</li></ol>';
+        } else {
+            help.textContent = 'To install: open your browser menu (\u22EE) and choose "Install app" or "Add to Home screen". If you already installed it, open it from your apps list.';
+        }
         help.hidden = false;
     }
-    if (isIOS) showHelp(); else setTimeout(showHelp, 1500);
+    if (isIOS) { btn.hidden = false; showHelp(); } else { setTimeout(showHelp, 1500); }
 })();
 </script>
 </body>
